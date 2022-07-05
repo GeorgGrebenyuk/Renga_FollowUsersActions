@@ -10,12 +10,18 @@ namespace Renga_FollowUsersActions
 {
     public class init_app : Renga.IPlugin
     {
+        private static Renga.IApplication renga_app = null;
+        private Renga.SelectionEventSource select_event;
         private List<Renga.ActionEventSource> m_eventSources = new List<Renga.ActionEventSource>();
+
         private static Dictionary<string, List<string>> rasdel2users = new Dictionary<string, List<string>>();
+        private static List<Guid> non_checked_objects_type = new List<Guid>();
         private static string project_file_path = null;
         private static Guid our_property_id = Guid.Parse("94f7fd69-2c9f-4c44-80b8-36524ab29a18");
-        private static Renga.IApplication renga_app = null;
-        private static string UserSID = null;
+       
+        //private static string UserSID = null;
+        private static List<string> permitted_rasdels = new List<string>();
+        
         private enum status_continue_process :int
         {
             AppStart = 0,
@@ -53,14 +59,22 @@ namespace Renga_FollowUsersActions
                 }
             }
 
-            UserSID = System.Security.Principal.WindowsIdentity.GetCurrent().User.Value;
             //Регистрация кнопок
+            //Кнопка выбора файла сопоставления раздела и SID пользователей, а также
+            //пропускаемых категорий объектов (Guid)
+            //как-то реализовать пропуск категорий и сейчас пока заполним условно
+            string UserSID = System.Security.Principal.WindowsIdentity.GetCurrent().User.Value;
+
+            non_checked_objects_type = new List<Guid>();
+            non_checked_objects_type.Add(Renga.ObjectTypes.Beam);
+            non_checked_objects_type.Add(Renga.ObjectTypes.Window);
+            non_checked_objects_type.Add(Renga.ObjectTypes.Plate);
+
             Renga.IAction action_select_roles = renga_user_interface.CreateAction();
             action_select_roles.DisplayName = "Выбор файла ролей";
-            //Привязываем к кнопке событие, вызывающее какие-то действия
             Renga.ActionEventSource event_for_button_select_roles = 
                 new Renga.ActionEventSource(action_select_roles);
-            //Формальная процедура назначения действия, когда происходит событие (у нас собатие = нажатию на кнопку)
+            
             event_for_button_select_roles.Triggered += (sender, args) =>
             {
                 OpenFileDialog select_file = new OpenFileDialog();
@@ -72,6 +86,11 @@ namespace Renga_FollowUsersActions
                     {
                         string[] str_array = str.Split(',');
                         rasdel2users.Add(str_array[0], str_array[1].Split(';').ToList());
+
+                        if (rasdel2users[str_array[0]].Contains(UserSID))
+                        {
+                            permitted_rasdels.Add(str_array[0]);
+                        }
                     }
                 }
             };
@@ -93,11 +112,31 @@ namespace Renga_FollowUsersActions
                     renga_app.UI.ShowMessageBox(MessageIcon.MessageIcon_Info, "Объявление",
                         "Всё корректно, работу можно начать!");
                 }
+                else
+                {
+                    //Повторить процедуру выбора файла сопоставления и регистрацию свойств в модели
+                }
             };
+            panel_extension.AddToolButton(action_validate_model);
 
             renga_user_interface.AddExtensionToPrimaryPanel(panel_extension);
             renga_user_interface.AddExtensionToActionsPanel(panel_extension,
                 Renga.ViewType.ViewType_View3D);
+            //Отслеживание выбора
+
+            var selection = renga_app.Selection;
+            if (selection == null) return false;
+            
+            else
+            {
+                select_event = new SelectionEventSource(selection);
+                select_event.ModelSelectionChanged += (sender, args) =>
+                {
+                    WorkWithSelectedObjects(selection.GetSelectedObjects());
+                };
+               
+                
+            }
             return true;
         }
         void Renga.IPlugin.Stop()
@@ -106,6 +145,41 @@ namespace Renga_FollowUsersActions
             foreach (var eventSource in m_eventSources)
                 eventSource.Dispose();
             m_eventSources.Clear();
+        }
+        private void WorkWithSelectedObjects(Array data)
+        {
+            List<int> els = data.OfType<int>().ToList();
+            List<int> els_non = new List<int>();
+            var model_objects_coll = renga_app.Project.Model.GetObjects();
+            foreach (int el_id in els)
+            {
+                Renga.IModelObject model_obj = model_objects_coll.GetById(el_id);
+                Renga.IProperty our_prop = model_obj.GetProperties().Get(our_property_id);
+                if (our_prop.HasValue())
+                {
+                    if (permitted_rasdels.Contains(our_prop.GetEnumerationValue()))
+                    {
+                        //ok
+                    }
+                    else
+                    {
+                        els_non.Add(el_id);
+                        //как-то снять выбор с объекта
+                    }
+                }
+                else
+                {
+                    renga_app.UI.ShowMessageBox(MessageIcon.MessageIcon_Error, "Предупреждение",
+                        $"Для объекта {model_obj.Name} среди выбранных не заполнено отслеживаемое свойство");
+                }
+            }
+
+            if (els_non.Any())
+            {
+                //Снимаем выделение с того что пользователю нельзя трогать
+                //и выкидываем предупреждение
+                
+            }
         }
         private static void ActionsOnStartProject()
         {
@@ -127,7 +201,8 @@ namespace Renga_FollowUsersActions
             {
                 foreach (KeyValuePair<string, Guid> name2prop in ObjectTypes())
                 {
-                    if (!prop_man.IsPropertyAssignedToType(our_property_id, name2prop.Value))
+                    //Исключение на общие типы (Балки, Отверстия, Пластины) используемые всеми
+                    if (!non_checked_objects_type.Contains(name2prop.Value) && !prop_man.IsPropertyAssignedToType(our_property_id, name2prop.Value))
                     {
                         prop_man.AssignPropertyToType(our_property_id, name2prop.Value);
                     }
@@ -163,6 +238,7 @@ namespace Renga_FollowUsersActions
                 current_progress = (int)status_continue_process.AllAttrsNonEmpty;
             }
         }
+        
         private static Dictionary<string, Guid> ObjectTypes()
         {
             return new Dictionary<string, Guid>
