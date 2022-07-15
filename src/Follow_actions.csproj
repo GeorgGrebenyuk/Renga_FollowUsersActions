@@ -4,15 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9EDF4D8D-BA42-4580-9B57-736731D2285C}</ProjectGuid>
+    <ProjectGuid>{CA8918A7-4760-472B-8574-572923E91973}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Renga_FollowUsersActions</RootNamespace>
-    <AssemblyName>Renga_FollowUsersActions</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <RootNamespace>Follow_actions</RootNamespace>
+    <AssemblyName>Follow_actions</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,13 +30,15 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Renga.NET.PluginUtility">
-      <HintPath>..\..\..\SDK\RengaSDK\Net\Renga.NET.PluginUtility.dll</HintPath>
+      <HintPath>G:\30_Coding\SDK\RengaSDK_20\Net\Renga.NET.PluginUtility.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -49,6 +50,16 @@
   <ItemGroup>
     <Compile Include="init_app.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Res.cs" />
+    <Compile Include="UsersSelection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UsersSelection.Designer.cs">
+      <DependentUpon>UsersSelection.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Follow_actions.rndesc" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="Renga">
@@ -62,11 +73,23 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Renga_FollowUsersActions.rndesc" />
+    <EmbeddedResource Include="UsersSelection.resx">
+      <DependentUpon>UsersSelection.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="logo_main.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>if not exist G:\Soft\Renga\Plugins\$(ProjectName) mkdir G:\Soft\Renga\Plugins\$(ProjectName)
-copy /Y  "$(ProjectDir)$(ProjectName).rndesc" "G:\Soft\Renga\Plugins\$(ProjectName)\$(ProjectName).rndesc"</PostBuildEvent>
+    <PostBuildEvent>if not exist "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)" mkdir "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)"
+copy /Y "$(ProjectDir)$(ProjectName).rndesc" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(ProjectName).rndesc"
+
+if $(ConfigurationName) == Release (
+copy /Y "$(TargetPath)" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(TargetFileName)" 
+copy /Y "$(ProjectDir)logo.png" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\logo.png" 
+copy /Y "$(RENGA_SDK)\Net\Renga.NET.PluginUtility.dll" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\Renga.NET.PluginUtility.dll")</PostBuildEvent>
   </PropertyGroup>
 </Project>
