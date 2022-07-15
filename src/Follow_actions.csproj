@@ -31,6 +31,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x64</PlatformTarget>
+    <DocumentationFile>bin\Release\Follow_actions.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>logo_main.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Renga.NET.PluginUtility">
@@ -78,6 +82,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="logo_main.ico" />
     <Content Include="logo_main.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -89,7 +94,7 @@ copy /Y "$(ProjectDir)$(ProjectName).rndesc" "$(RENGA_INSTALL_DIR)\Plugins\$(Pro
 
 if $(ConfigurationName) == Release (
 copy /Y "$(TargetPath)" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(TargetFileName)" 
-copy /Y "$(ProjectDir)logo.png" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\logo.png" 
+copy /Y "$(ProjectDir)logo_main.png" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\logo_main.png" 
 copy /Y "$(RENGA_SDK)\Net\Renga.NET.PluginUtility.dll" "$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\Renga.NET.PluginUtility.dll")</PostBuildEvent>
   </PropertyGroup>
 </Project>

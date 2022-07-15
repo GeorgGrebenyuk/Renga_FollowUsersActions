@@ -9,7 +9,7 @@
 	<!-- Minimum required version of Renga API -->
 	<PluginType>Net</PluginType>
 	<!-- Plugin type. Use "net" for .NET (C#, C++/CLI) and "cpp" for Visual C++. Optional, defaults to "cpp" -->
-	<PluginFilename>C:\Users\Georg\Documents\GitHub\Renga_FollowUsersActions\src\bin\Debug\Follow_actions.dll</PluginFilename>
+	<PluginFilename>Follow_actions.dll</PluginFilename>
 	<!-- Path to the plugin's binary file, either relative to the folder containing the .rndesc file or an absolute one -->
 	<Vendor>-</Vendor>
 	<!-- Vendor of the plugin -->
