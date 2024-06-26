@@ -13,11 +13,12 @@ namespace Follow_actions
         {
             return new Dictionary<string, Guid>
             {
+                { "Угловой размер",  Renga.ObjectTypes.AngularDimension},
                 { "Сборка",   Renga.ObjectTypes.AssemblyInstance},
                 { "Ось",   Renga.ObjectTypes.Axis},
                 { "Балка",   Renga.ObjectTypes.Beam},
                 { "Колонна", Renga.ObjectTypes.Column},
-                { "Размер",  Renga.ObjectTypes.Dimension},
+                { "Диаметральный размер",  Renga.ObjectTypes.DiametralDimension},
                 { "Дверь",   Renga.ObjectTypes.Door},
                 { "Воздуховод",   Renga.ObjectTypes.Duct},
                 { "Аксессуар воздуховода",  Renga.ObjectTypes.DuctAccessory},
@@ -28,11 +29,13 @@ namespace Follow_actions
                 { "Оборудование",  Renga.ObjectTypes.Equipment},
                 { "Перекрытие",  Renga.ObjectTypes.Floor},
                 { "Штриховка",  Renga.ObjectTypes.Hatch},
+                { "Отверстие",  Renga.ObjectTypes.Hole},
                 { "IfcObject",  Renga.ObjectTypes.IfcObject},
                 { "Ленточный фундамент", Renga.ObjectTypes.IsolatedFoundation},
                 { "Уровень",  Renga.ObjectTypes.Level},
                 { "Осветительный прибор",   Renga.ObjectTypes.LightFixture},
                 { "Line3D", Renga.ObjectTypes.Line3D},
+                { "Линейный размер",  Renga.ObjectTypes.LinearDimension},
                 { "Электрическая линия",  Renga.ObjectTypes.LineElectricalCircuit},
                 { "Механическое оборудование", Renga.ObjectTypes.MechanicalEquipment},
                 { "Проем в перекрытии",   Renga.ObjectTypes.Opening},
@@ -41,6 +44,7 @@ namespace Follow_actions
                 { "Фитинг трубопровода",  Renga.ObjectTypes.PipeFitting},
                 { "Пластина",  Renga.ObjectTypes.Plate},
                 { "Сантехническое оборудование",  Renga.ObjectTypes.PlumbingFixture},
+                { "Радиальный размер",  Renga.ObjectTypes.RadialDimension},
                 { "Ограждение", Renga.ObjectTypes.Railing},
                 { "Пандус",   Renga.ObjectTypes.Ramp},
                 { "Арматура",  Renga.ObjectTypes.Rebar},
@@ -50,10 +54,10 @@ namespace Follow_actions
                 { "Точка трассировки", Renga.ObjectTypes.RoutePoint},
                 { "Секция", Renga.ObjectTypes.Section},
                 { "Лестница",  Renga.ObjectTypes.Stair},
-                { "Текстовая аннотация",  Renga.ObjectTypes.TextShape},
-                //{ "Undefined",  Renga.ObjectTypes.Undefined},
+                { "Текстовая аннотация",  Renga.ObjectTypes.TextObject},
+                { "Undefined",  Renga.ObjectTypes.Undefined},
                 { "Стена",   Renga.ObjectTypes.Wall},
-                { "Столючатый фундамент", Renga.ObjectTypes.WallFoundation},
+                { "Столбчатый фундамент", Renga.ObjectTypes.WallFoundation},
                 { "Окно", Renga.ObjectTypes.Window},
                 { "Электроустановочное изделие",Renga.ObjectTypes.WiringAccessory},
             };
@@ -66,11 +70,11 @@ namespace Follow_actions
         public static uint MB_DEFBUTTON1 = 0x00000000;
         public static int IDNO = 7;
 
-        public static List<string> design_sections ()
-         {
-            return new List<string> {"_no", "АР", "АС", "ВК", "ГП", "ИОС", "КД", "КЖ","КМД","КР","НВК",
-            "ОВ", "ПБ", "ПЗУ", "ПОС", "ППР", "СС", "ТК", "ТС", "ТХ", "ЭО","ЭС","ЭЭ"  };
+        //public static List<string> design_sections ()
+        // {
+        //    return new List<string> {"_no", "АР", "АС", "ВК", "ГП", "ИОС", "КД", "КЖ","КМД","КР","НВК",
+        //    "ОВ", "ПБ", "ПЗУ", "ПОС", "ППР", "СС", "ТК", "ТС", "ТХ", "ЭО","ЭС","ЭЭ"  };
            
-        }
+        //}
     }
 }

@@ -1,0 +1,53 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+    <LangVersion>9.0</LangVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Platforms>x64</Platforms>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Configurations>Debug;Release</Configurations>
+    <Version>1.2.0</Version>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <ApplicationIcon>logo_main.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <COMReference Include="Renga">
+      <WrapperTool>tlbimp</WrapperTool>
+      <VersionMinor>0</VersionMinor>
+      <VersionMajor>1</VersionMajor>
+      <Guid>0ec5d324-8b9f-4d30-84ed-ab711618d1c1</Guid>
+      <Lcid>0</Lcid>
+      <Isolated>false</Isolated>
+      <EmbedInteropTypes>true</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="logo_main.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Renga.NET.PluginUtility">
+      <HintPath>E:\30_Coding\SDK\RengaSDK\Net\Renga.NET.PluginUtility.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="logo_main.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="if not exist &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)&quot; mkdir &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)&quot;&#xD;&#xA;del RD /S /Q &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)&quot;&#xD;&#xA;copy /Y &quot;$(ProjectDir)$(ProjectName)_DBG.rndesc&quot; &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(ProjectName).rndesc&quot;&#xD;&#xA;if $(ConfigurationName) == Release (&#xD;&#xA;copy /Y &quot;$(ProjectDir)$(ProjectName)_REL.rndesc&quot; &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(ProjectName).rndesc&quot;&#xD;&#xA;copy /Y &quot;$(TargetPath)&quot; &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\$(TargetFileName)&quot; &#xD;&#xA;copy /Y &quot;$(ProjectDir)logo_main.png&quot; &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\logo_main.png&quot; &#xD;&#xA;copy /Y &quot;$(RENGA_SDK)\Net\Renga.NET.PluginUtility.dll&quot; &quot;$(RENGA_INSTALL_DIR)\Plugins\$(ProjectName)\Renga.NET.PluginUtility.dll&quot;)" />
+  </Target>
+
+</Project>

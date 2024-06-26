@@ -16,18 +16,80 @@ namespace Follow_actions
         {
             InitializeComponent();
             //Отображение в форме типов объектов Renga
+            dataGridView1.RowHeadersVisible = false;
             dataGridView1.ColumnCount = 1;
             dataGridView1.Columns[0].Name = "Типы объектов в Renga";
-            dataGridView1.Columns[0].Width = 350;
+            dataGridView1.Columns[0].Width = 294;
 
             foreach (KeyValuePair<string,Guid> objtype2id in Res.ObjectTypes())
             {
                 dataGridView1.Rows.Add(objtype2id.Key);
             }
             radioButton1.Checked = true;
-            textBox1.Text = String.Join(";", Res.design_sections().ToArray());
-        }
+            //textBox1.Text = String.Join(";", Res.design_sections().ToArray());
+            using_username.Checked = true;
+            this.system_sid.Text = System.Security.Principal.WindowsIdentity.GetCurrent().User.Value;
+            this.system_username.Text = Environment.UserName;
 
+            Renga.IPropertyManager prop_man = init_app.renga_app.Project.PropertyManager;
+            if (prop_man.IsPropertyRegistered(init_app.our_property_id))
+            {
+                //Если это свойство есть, выводим информацию по его значениям
+                current_file_ids.Text = GetItemsOurProperty;
+            }
+
+        }
+        private string GetItemsOurProperty => string.Join(";", init_app.renga_app.Project.PropertyManager.
+            GetPropertyDescription2(init_app.our_property_id).GetEnumerationItems().OfType<string>());
+        //private void update_property(string[] new_props)
+        //{
+        //    /*Из за того что *** ренга не умеет ОБНОВЛЯТЬ свойство его придется счиытвать у всех объектов,
+        //     потом удалять, заново регистрировать и назначать значения ... пиздец*/
+        //    var manager = init_app.renga_app.Project.PropertyManager;
+        //    Dictionary<int, string> object2property = new Dictionary<int, string>();
+        //    Renga.IModelObjectCollection model_objects = init_app.renga_app.Project.Model.GetObjects();
+        //    for (int counter_objects = 0; counter_objects < model_objects.Count; counter_objects++)
+        //    {
+        //        Renga.IModelObject one_object = model_objects.GetByIndex(counter_objects);
+        //        if (one_object.GetProperties().Contains(init_app.our_property_id))
+        //        {
+        //            Renga.IProperty obj_prop = one_object.GetProperties().Get(init_app.our_property_id);
+        //            object2property.Add(counter_objects, obj_prop.GetEnumerationValue());
+        //        }
+        //    }
+        //    manager.UnregisterProperty(init_app.our_property_id);
+        //    Renga.IPropertyDescription descr = manager.CreatePropertyDescription("Идентификатор_Слежение",
+        //            Renga.PropertyType.PropertyType_Enumeration);
+        //    descr.SetEnumerationItems(new_props);
+        //    manager.RegisterProperty2(init_app.our_property_id, descr);
+
+        //    List<Guid> needing_obj_types;
+        //    if (init_app.no_following_object_types == null | (init_app.no_following_object_types != null &&
+        //        init_app.no_following_object_types.Count() == 0))
+        //    {
+        //        //Учитываем все категории объектов
+        //        needing_obj_types = Res.ObjectTypes().Select(a => a.Value).ToList();
+        //    }
+        //    //Учитываем все за минусом обозначенных пользователем
+        //    else needing_obj_types = Res.ObjectTypes().Select(a => a.Value).ToList().
+        //            Except(init_app.no_following_object_types).ToList();
+
+        //    foreach (Guid obj_type in needing_obj_types)
+        //    {
+        //        if (!manager.IsPropertyAssignedToType(init_app.our_property_id, obj_type))
+        //            manager.AssignPropertyToType(init_app.our_property_id, obj_type);
+        //    }
+
+        //    for (int counter_objects = 0; counter_objects < model_objects.Count; counter_objects++)
+        //    {
+        //        Renga.IModelObject one_object = model_objects.GetByIndex(counter_objects);
+        //        if (one_object.GetProperties().Contains(init_app.our_property_id))
+        //        {
+        //            Renga.IProperty obj_prop = one_object.GetProperties().Get(init_app.our_property_id);
+        //            obj_prop.SetEnumerationValue(object2property[counter_objects]);
+        //        }
+        //    }
+        //}
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
@@ -54,7 +116,8 @@ namespace Follow_actions
                     selected_categories.Add(finded.Key);
                 }
                 init_app.renga_app.UI.ShowMessageBox(MessageIcon.MessageIcon_Info, "Сообщение",
-                    "Были выбраны следующие категории объектов модели: \n" + String.Join("\n", selected_categories.ToArray()));
+                    "Были выбраны следующие категории объектов модели: \n" + 
+                    String.Join("\n", selected_categories.ToArray()));
             }
             int temp0 = 0;
             
@@ -66,28 +129,60 @@ namespace Follow_actions
         /// <param name="e"></param>
         private void button2_Click(object sender, EventArgs e)
         {
+            if (init_app.permitted_design_sections == null)
+            {
+                init_app.renga_app.UI.ShowMessageBox(MessageIcon.MessageIcon_Error, "Сообщение",
+                    "Отсутствует файл сопоставления Идентификаторов для данного пользователя");
+                return;
+            }
             //Проверка пункта 1 - есть ли свойство в модели
             Renga.IPropertyManager prop_man = init_app.renga_app.Project.PropertyManager;
             if (!prop_man.IsPropertyRegistered(init_app.our_property_id))
             {
                 //Создаем это свойство и регистрируем в проекте
-                Renga.IPropertyDescription descr = prop_man.CreatePropertyDescription("Раздел_Слежение",
+                Renga.IPropertyDescription descr = prop_man.CreatePropertyDescription("Идентификатор_Слежение",
                     Renga.PropertyType.PropertyType_Enumeration);
 
-                string text_box = textBox1.Text;
-                descr.SetEnumerationItems(text_box.Split(';'));
+
+                string text_box = "_no;";
+                if (textBox1.Text.Any()) 
+                {
+                    text_box += textBox1.Text;
+                    if (textBox1.Text.Last() != ';') text_box += ";";
+
+                }
+                if (current_file_ids.Text.Any())
+                {
+                    text_box += current_file_ids.Text;
+                }
+                var ids = text_box.Split(';').Distinct().ToArray();
+                descr.SetEnumerationItems(ids);
                 prop_man.RegisterProperty2(init_app.our_property_id, descr);
+            }
+            else
+            {
+                Renga.IPropertyDescription descr = prop_man.GetPropertyDescription2(init_app.our_property_id);
+                string text_box = GetItemsOurProperty;
+                if (textBox1.Text.Any())
+                {
+                    text_box += ";" + textBox1.Text;
+                    //update_property(text_box.Split(';').Distinct().ToArray());
+                    descr.SetEnumerationItems(text_box.Split(';').Distinct().ToArray());
+                }
+                this.current_file_ids.Text = GetItemsOurProperty;
             }
             int temp1 = 1;
             //Проверка пункт 2 - назначено ли свойство категориям объектов модели
             List<Guid> needing_obj_types;
-            if (init_app.no_following_object_types == null | (init_app.no_following_object_types != null && init_app.no_following_object_types.Count() == 0))
+            if (init_app.no_following_object_types == null | (init_app.no_following_object_types != null && 
+                init_app.no_following_object_types.Count() == 0))
             {
                 //Учитываем все категории объектов
                 needing_obj_types = Res.ObjectTypes().Select(a => a.Value).ToList();
             }
             //Учитываем все за минусом обозначенных пользователем
-            else needing_obj_types = Res.ObjectTypes().Select(a => a.Value).ToList().Except(init_app.no_following_object_types).ToList();
+            else needing_obj_types = Res.ObjectTypes().Select(a => a.Value).ToList().
+                    Except(init_app.no_following_object_types).ToList();
 
             foreach (Guid obj_type in needing_obj_types)
             {
@@ -123,8 +218,10 @@ namespace Follow_actions
             if (model_objects_ids_empty.Any())
             {
                 int message_box_return_type = Res.MessageBox(IntPtr.Zero, "В модели имеются объекты, " +
-                    "которым не назначено свойство принадлежности к разделу проектирования. Если вы нажмете на 'Нет' - то они останутся выделенными для" +
-                    "редактирования свойства. Если нажмете на 'Да' - то плагин начнет работу при новом выделении объектов", "Предупреждение",
+                    "которым не назначено свойство принадлежности к вашему Идентификатору. " +
+                    "Если вы нажмете на 'Нет' - то они останутся выделенными для " +
+                    "редактирования свойства. Если нажмете на 'Да' - то плагин начнет работу " +
+                    "при новом выделении объектов", "Предупреждение",
                     Res.MB_ICONQUESTION | Res.MB_YESNO | Res.MB_DEFBUTTON1);
                 if (message_box_return_type == Res.IDNO)
                 {
@@ -136,7 +233,8 @@ namespace Follow_actions
                     {
                         mview.SetObjectsVisibility(objects_to_hide.ToArray(), false);
                     }
-                    else init_app.renga_app.UI.ShowMessageBox(Renga.MessageIcon.MessageIcon_Error, "Ошибка", "Запустите эту опцию из 3д-вида");
+                    else init_app.renga_app.UI.ShowMessageBox(Renga.MessageIcon.MessageIcon_Error, "Ошибка", 
+                        "Запустите эту опцию из 3д-вида");
                 }
                 else
                 {
@@ -167,21 +265,32 @@ namespace Follow_actions
         {
             OpenFileDialog select_user_roles = new OpenFileDialog();
             string user_sid = System.Security.Principal.WindowsIdentity.GetCurrent().User.Value;
+            string user_name = Environment.UserName;
+            string compare_with;
+            if (this.using_username.Checked) compare_with = user_name;
+            else compare_with = user_sid;
             if (select_user_roles.ShowDialog() == DialogResult.OK)
             {
                 string file_path = select_user_roles.FileName;
                 if (File.Exists(file_path))
                 {
                     string[] file_data = File.ReadAllLines(file_path);
+                    List<string> ids = new List<string>();
                     foreach (string one_string in file_data)
                     {
-                        if (one_string.Split('\t')[0] == user_sid)
+                        if (one_string.Split('\t')[0] == compare_with)
                         {
                             IEnumerable<string> users_design_section = one_string.Split('\t')[1].Split(';');
-                            if (users_design_section.Any()) init_app.permitted_design_sections = users_design_section.ToList();
+                            if (users_design_section.Any()) 
+                            {
+                                init_app.permitted_design_sections = users_design_section.ToList();
+                                foreach (string id in users_design_section) { ids.Add(id); }
+                            }
                             else return;
                         }
                     }
+                    ids.Distinct();
+                    this.current_file_ids.Text = this.GetItemsOurProperty;
                 }
                 else return;
             }
@@ -191,7 +300,7 @@ namespace Follow_actions
             {
                 init_app.renga_app.UI.ShowMessageBox(MessageIcon.MessageIcon_Warning, "Ошибка",
                     "Не обнаружена позиция сопоставления данного идентификатора " +
-                    "пользователя с разрешенными для редактирования разделами");
+                    "пользователя с разрешенными для редактирования Идентификаторами объектов");
             }
             int temp0 = 0;
         }
@@ -229,6 +338,36 @@ namespace Follow_actions
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start("https://github.com/GeorgGrebenyuk/Renga_FollowUsersActions");
+        }
+
+        private void button_load_settings_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void current_file_ids_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void using_sid_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void using_username_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void system_sid_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void system_username_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
