@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
@@ -12,7 +12,7 @@
     <GenerateDependencyFile>true</GenerateDependencyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <Configurations>Debug;Release</Configurations>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
     <ApplicationIcon>logo_main.ico</ApplicationIcon>
@@ -36,7 +36,8 @@
 
   <ItemGroup>
     <Reference Include="Renga.NET.PluginUtility">
-      <HintPath>E:\30_Coding\SDK\RengaSDK\Net\Renga.NET.PluginUtility.dll</HintPath>
+      <HintPath>D:\PROCESSING\SDK\RengaSDK\Net\Renga.NET.PluginUtility.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
 

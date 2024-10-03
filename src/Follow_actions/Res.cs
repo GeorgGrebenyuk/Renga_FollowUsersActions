@@ -33,7 +33,7 @@ namespace Follow_actions
                 { "IfcObject",  Renga.ObjectTypes.IfcObject},
                 { "Ленточный фундамент", Renga.ObjectTypes.IsolatedFoundation},
                 { "Уровень",  Renga.ObjectTypes.Level},
-                { "Осветительный прибор",   Renga.ObjectTypes.LightFixture},
+                { "Осветительный прибор",   Renga.ObjectTypes.LightingFixture},
                 { "Line3D", Renga.ObjectTypes.Line3D},
                 { "Линейный размер",  Renga.ObjectTypes.LinearDimension},
                 { "Электрическая линия",  Renga.ObjectTypes.LineElectricalCircuit},
