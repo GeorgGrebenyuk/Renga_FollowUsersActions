@@ -5,7 +5,7 @@
 	<!-- Plugin version -->
 	<Copyright>GeorgGrebenyuk</Copyright>
 	<!-- Copyright information -->
-	<RequiredAPIVersion>2.32</RequiredAPIVersion>
+	<RequiredAPIVersion>2.36</RequiredAPIVersion>
 	<!-- Minimum required version of Renga API -->
 	<PluginType>Net</PluginType>
 	<!-- Plugin type. Use "net" for .NET (C#, C++/CLI) and "cpp" for Visual C++. Optional, defaults to "cpp" -->
